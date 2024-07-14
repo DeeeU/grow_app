@@ -1,4 +1,11 @@
 <div>
   <h1 class="font-bold text-4xl">Binary#index</h1>
   <p>Find me in app/views/binary/index.html.erb</p>
+
+  <% @binaries.each do |binary| %>
+    <p>
+      <%= link_to binary.title, binary_path(binary.id)  %>
+      <%= binary.context %>
+    </p>
+  <% end %>
 </div>
