@@ -44,5 +44,6 @@ Things you may want to cover:
 - Rspec のヘッドレス Chrome ブラウザのテストへの切り替え
 - フラッシュメッセージの追加
 - Circle/CI の追加
+  - Docker コンテナでの開発が好まれる為、切り替えが必要そう
 - リファクタ
 - UI 整え
