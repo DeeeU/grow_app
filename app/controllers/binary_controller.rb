@@ -22,7 +22,14 @@ class BinaryController < ApplicationController
   end
 
   def destroy
-    @binary = Binary.find(params[:id])
+    binary = Binary.find(params[:id])
+    if binary.delete
+      flash.now[:success] = '日記の削除完了'
+      redirect_to binary_index_path
+    else
+      flash.now[:error] = '日記の削除失敗'
+      render :show
+    end
   end
 
   private
