@@ -1,11 +1,20 @@
-<div>
-  <h1>Binary#index</h1>
-  <%= link_to 'new Binary', new_binary_path %>
+<div class="p-4">
+  <h1 >Binary#index</h1>
 
-  <% @binaries.each do |binary| %>
-    <p>
-      <%= link_to binary.title, binary_path(binary.id)  %>
-      <%= binary.context %>
-    </p>
-  <% end %>
+  <div class="flex justify-end mb-6">
+    <%= link_to 'New Binary', new_binary_path, class: 'inline-block px-6 py-3 text-white bg-blue-500 hover:bg-blue-600 rounded-lg shadow-md transition duration-300' %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% @binaries.each do |binary| %>
+      <a href="<%= binary_path(binary) %>" class="block max-w-sm mx-auto bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+        <%# <img class="w-full h-48 object-cover" src="https://via.placeholder.com/400x200" alt="Card image"> %>
+        <img class="w-full h-48 object-cover" src=" https://puppetsunsun.com/cdn/shop/files/RE_TOP2.png?v=1694446031&width=3840" alt="Card image">
+        <div class="p-6">
+          <h2 class="text-2xl font-bold text-gray-800 mb-2"><%= binary.title %></h2>
+          <p class="text-gray-600"><%= truncate(binary.context, length: 100) %></p>
+        </div>
+      </a>
+    <% end %>
+  </div>
 </div>
