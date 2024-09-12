@@ -2,12 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-/*
-
-@layer components {
-  .btn-primary {
-    @apply py-2 px-4 bg-blue-200;
-  }
+/* メインコンテンツエリアを画面いっぱいに広げ、左右・上下にマージンを追加 */
+.container {
+  @apply mx-auto px-8 py-10 max-w-screen-xl;
 }
 
-*/
+/* 見出しのデザイン。h1は大きく水色、他の見出しは少し小さめ */
+h1 {
+  @apply text-5xl font-bold text-blue-400 mb-6;
+}
+
+h2 {
+  @apply text-3xl font-semibold text-blue-500 mb-4;
+}
+
+/* 段落のマージンやフォントサイズの調整 */
+p {
+  @apply text-lg text-gray-700 mb-4;
+}
+
+/* ボタンのデザイン (例: 送信ボタン) */
+button {
+  @apply bg-blue-500 text-white py-2 px-4 rounded;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  @apply bg-blue-600;
+}
