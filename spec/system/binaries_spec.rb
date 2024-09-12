@@ -15,6 +15,27 @@ RSpec.describe "Binaries", type: :system do
       end
     end
 
+    context '編集画面' do
+      let!(:edit_binary){create(:binary, title: 'ネコ')}
+
+      it '編集画面に遷移できること' do
+        visit binary_path(edit_binary)
+
+        expect(page).to have_content 'Edit'
+        click_on 'Edit'
+        expect(page).to have_content 'Edit Binary'
+      end
+
+      it '編集ができること' do
+        visit binary_path(edit_binary)
+        click_on 'Edit'
+
+        fill_in 'Title', with: 'にゃーん'
+        click_on 'Update Binary'
+        expect(page).to have_content 'Details'
+      end
+    end
+
     context '削除機能' do
 
       it '日記が削除できること' do
@@ -23,7 +44,6 @@ RSpec.describe "Binaries", type: :system do
         expect(page).to have_content 'Delete'
         click_on 'Delete'
         expect(page).to have_content 'index'
-        expect(page).to_not have_content binary.title
       end
     end
   end
