@@ -2,11 +2,20 @@
   <h1 >Binary#index</h1>
 
   <div class="flex justify-end mb-6">
+    <%= form_with url: binary_index_path, method: :get, local: true, class: "mb-6" do %>
+      <div class="flex items-center space-x-4">
+        <%= text_field_tag :title, params[:title], placeholder: "Enter title", class: "form-input w-full px-4 py-2 border rounded-md shadow-sm" %>
+        <%= submit_tag "Search", class: "bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="flex justify-end mb-6">
     <%= link_to 'New Binary', new_binary_path, class: 'inline-block px-6 py-3 text-white bg-blue-500 hover:bg-blue-600 rounded-lg shadow-md transition duration-300' %>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <% @binaries.each do |binary| %>
+    <% @search_result.each do |binary| %>
       <a href="<%= binary_path(binary) %>" class="block max-w-sm mx-auto bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
         <%# <img class="w-full h-48 object-cover" src="https://via.placeholder.com/400x200" alt="Card image"> %>
         <img class="w-full h-48 object-cover" src=" https://puppetsunsun.com/cdn/shop/files/RE_TOP2.png?v=1694446031&width=3840" alt="Card image">

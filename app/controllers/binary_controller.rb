@@ -3,6 +3,7 @@ class BinaryController < ApplicationController
 
   def index
     @binaries = Binary.all
+    @search_result = @binaries.search_title(params[:title]).order(:created_at)
   end
 
   def show
