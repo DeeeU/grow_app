@@ -1,16 +1,13 @@
 # == Schema Information
 #
-# Table name: binaries
+# Table name: tags
 #
 #  id         :integer          not null, primary key
+#  color      :string           default("#FFFFFF"), not null
 #  context    :string
-#  title      :string
+#  name       :string           not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
-FactoryBot.define do
-  factory :binary do
-    title { "Sample Title" }
-    context { "Sample Context" }
-  end
+class Tag < ApplicationRecord
 end
