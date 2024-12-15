@@ -9,5 +9,7 @@
 #  updated_at :datetime         not null
 #
 class Binary < ApplicationRecord
+  has_and_belongs_to_many :tags
+
   scope :search_title, ->(title) { where('title LIKE ?', "%#{title}%") }
 end
