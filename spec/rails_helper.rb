@@ -31,6 +31,14 @@ rescue ActiveRecord::PendingMigrationError => e
   exit 1
 end
 RSpec.configure do |config|
+  config.before(:each, type: :system) do
+    # テスト実行ごとに一意のユーザーデータディレクトリを使用
+    driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400], options: {
+      browser: {
+        args: %W[--headless --disable-gpu --no-sandbox --user-data-dir=#{Dir.mktmpdir}]
+      }
+    }
+  end
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
 

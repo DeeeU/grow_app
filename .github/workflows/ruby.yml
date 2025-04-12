@@ -1,38 +1,51 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will download a prebuilt Ruby version, install dependencies and run tests with Rake
-# For more information see: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
-
 name: Ruby
-
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
-
+    branches: ["main"]
 permissions:
   contents: read
-
 jobs:
   test:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: ['2.6', '2.7', '3.0']
-
+        ruby-version: ["3.3.0"]
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Ruby
-    # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
-    # change this to (see https://github.com/ruby/setup-ruby#versioning):
-    # uses: ruby/setup-ruby@v1
-      uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
-      with:
-        ruby-version: ${{ matrix.ruby-version }}
-        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-    - name: Run tests
-      run: bundle exec rake
+      - uses: actions/checkout@v4
+      # Rubyを手動でインストール
+      - name: Install Ruby
+        run: |
+          curl -fsSL https://github.com/rbenv/ruby-build/archive/refs/heads/master.tar.gz | tar -xz
+          PREFIX=/usr/local ./ruby-build-master/bin/ruby-build ${{ matrix.ruby-version }} $HOME/.rubies/ruby-${{ matrix.ruby-version }}
+          echo "$HOME/.rubies/ruby-${{ matrix.ruby-version }}/bin" >> $GITHUB_PATH
+          export PATH=$HOME/.rubies/ruby-${{ matrix.ruby-version }}/bin:$PATH
+          ruby --version
+
+      # Bundlerをインストールして確認
+      - name: Install Bundler
+        run: |
+          export PATH=$HOME/.rubies/ruby-${{ matrix.ruby-version }}/bin:$PATH
+          gem install bundler
+          which bundle
+          bundle --version
+
+      # 依存関係をインストール
+      - name: Install dependencies
+        run: |
+          export PATH=$HOME/.rubies/ruby-${{ matrix.ruby-version }}/bin:$PATH
+          bundle install
+
+      - name: Fix Chrome for system tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser
+          export CHROME_BIN=/usr/bin/chromium-browser
+          echo "CHROME_BIN=/usr/bin/chromium-browser" >> $GITHUB_ENV
+
+      # テスト実行
+      - name: Run tests
+        run: |
+          export PATH=$HOME/.rubies/ruby-${{ matrix.ruby-version }}/bin:$PATH
+          bundle exec rake
