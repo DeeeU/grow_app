@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-22.04 # ubuntu-latest の代わりに特定のバージョンを指定
     strategy:
       matrix:
-        ruby-version: ["2.7", "3.2"]
+        ruby-version: ["2.7", "3.3"]
 
     steps:
       - uses: actions/checkout@v4
