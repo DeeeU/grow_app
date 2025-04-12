@@ -18,10 +18,10 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-22.04 # ubuntu-latest の代わりに特定のバージョンを指定
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: ["2.7", "3.3"]
+        ruby-version: ["2.7", "3.3.0"]
 
     steps:
       - uses: actions/checkout@v4
