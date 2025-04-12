@@ -27,9 +27,13 @@ jobs:
           export PATH=$RUNNER_TOOL_CACHE/ruby-${{ matrix.ruby-version }}/bin:$PATH
           ruby --version
 
+      # Set GEM_HOME to a writable directory
+      - name: Configure GEM_HOME
+        run: echo "export GEM_HOME=$HOME/.gem" >> $GITHUB_ENV
+
       # Set up Bundler and cache gems
       - name: Install Bundler
-        run: gem install bundler
+        run: gem install bundler --user-install
 
       - name: Install dependencies
         run: bundle install
