@@ -1,43 +1,44 @@
 name: Ruby
-
 on:
   push:
     branches: ["main"]
   pull_request:
     branches: ["main"]
-
 permissions:
   contents: read
-
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         ruby-version: ["3.3.0"]
-
     steps:
       - uses: actions/checkout@v4
-
-      # Install Ruby manually for self-hosted runners
+      # Rubyを手動でインストール
       - name: Install Ruby
         run: |
           curl -fsSL https://github.com/rbenv/ruby-build/archive/refs/heads/master.tar.gz | tar -xz
-          PREFIX=/usr/local ./ruby-build-master/bin/ruby-build ${{ matrix.ruby-version }} $RUNNER_TOOL_CACHE/ruby-${{ matrix.ruby-version }}
-          export PATH=$RUNNER_TOOL_CACHE/ruby-${{ matrix.ruby-version }}/bin:$PATH
+          PREFIX=/usr/local ./ruby-build-master/bin/ruby-build ${{ matrix.ruby-version }} $HOME/.rubies/ruby-${{ matrix.ruby-version }}
+          echo "$HOME/.rubies/ruby-${{ matrix.ruby-version }}/bin" >> $GITHUB_PATH
+          export PATH=$HOME/.rubies/ruby-${{ matrix.ruby-version }}/bin:$PATH
           ruby --version
 
-      # Set GEM_HOME to a writable directory
-      - name: Configure GEM_HOME
-        run: echo "export GEM_HOME=$HOME/.gem" >> $GITHUB_ENV
-
-      # Set up Bundler and cache gems
+      # Bundlerをインストールして確認
       - name: Install Bundler
-        run: gem install bundler --user-install
+        run: |
+          export PATH=$HOME/.rubies/ruby-${{ matrix.ruby-version }}/bin:$PATH
+          gem install bundler
+          which bundle
+          bundle --version
 
+      # 依存関係をインストール
       - name: Install dependencies
-        run: bundle install
+        run: |
+          export PATH=$HOME/.rubies/ruby-${{ matrix.ruby-version }}/bin:$PATH
+          bundle install
 
-      # Run tests
+      # テスト実行
       - name: Run tests
-        run: bundle exec rake
+        run: |
+          export PATH=$HOME/.rubies/ruby-${{ matrix.ruby-version }}/bin:$PATH
+          bundle exec rake
