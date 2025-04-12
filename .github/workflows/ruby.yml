@@ -37,6 +37,13 @@ jobs:
           export PATH=$HOME/.rubies/ruby-${{ matrix.ruby-version }}/bin:$PATH
           bundle install
 
+      - name: Fix Chrome for system tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser
+          export CHROME_BIN=/usr/bin/chromium-browser
+          echo "CHROME_BIN=/usr/bin/chromium-browser" >> $GITHUB_ENV
+
       # テスト実行
       - name: Run tests
         run: |
