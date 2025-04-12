@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: ["3.3.0"]
+        ruby-version: ["2.7", "3.2.2"] # 3.3がない場合は3.2の最新を使用
 
     steps:
       - uses: actions/checkout@v4
