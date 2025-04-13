@@ -1,0 +1,177 @@
+<%= form_with model: binary, url: binary.new_record? ? binary_index_path : binary_path(binary), local: true, disabled: local_assigns[:readonly] do |form| %>
+  <div class="field mb-4">
+    <%= form.label :title, class: 'block mb-1' %>
+    <% if local_assigns[:readonly] %>
+      <div class="w-full p-2 border rounded bg-gray-50"><%= binary.title %></div>
+    <% else %>
+      <%= form.text_field :title, class: 'form-control w-full p-2 border rounded' %>
+    <% end %>
+  </div>
+
+  <div class="field mb-4">
+    <%= form.label :context, class: 'block mb-1' %>
+    <% if local_assigns[:readonly] %>
+      <div class="w-full p-2 border rounded bg-gray-50 min-h-[100px]"><%= binary.context %></div>
+    <% else %>
+      <%= form.text_area :context, class: 'form-control w-full p-2 border rounded', rows: 4 %>
+    <% end %>
+  </div>
+
+  <div class="field mb-6">  <!-- mb-4からmb-6に変更してマージンを増やす -->
+    <h3 class="font-bold text-lg mb-2">タグ</h3>
+
+    <% if local_assigns[:readonly] %>
+      <div class="flex flex-wrap gap-2 mb-4">  <!-- mb-4を追加 -->
+        <% if binary.tags.any? %>
+          <% binary.tags.each do |tag| %>
+            <span style="background-color: <%= tag.color %>; padding: 4px 8px; border-radius: 4px; display: inline-block; font-size: 0.75rem; display: inline-block; margin: 2px;">
+              <%= tag.name %>
+            </span>
+          <% end %>
+        <% else %>
+          <p>タグなし</p>
+        <% end %>
+      </div>
+    <% else %>
+      <!-- タグ追加オプションの切り替え -->
+      <div class="mb-3">
+        <label class="inline-flex items-center mr-4">
+          <input type="radio" name="tag_option" value="none" checked class="tag-option-radio">
+          <span class="ml-2">タグを付けない</span>
+        </label>
+        <label class="inline-flex items-center mr-4">
+          <input type="radio" name="tag_option" value="existing" class="tag-option-radio">
+          <span class="ml-2">既存のタグから選択</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input type="radio" name="tag_option" value="new" class="tag-option-radio">
+          <span class="ml-2">新規タグを作成</span>
+        </label>
+      </div>
+
+      <!-- 既存タグ選択セクション -->
+      <div id="existing-tags-section" class="tag-section hidden">
+        <div class="flex flex-wrap gap-2">
+          <% @tags.each do |tag| %>
+            <div class="tag-item">
+              <%= check_box_tag 'binary[tag_ids][]', tag.id, binary.tags.include?(tag), id: "tag_#{tag.id}" %>
+              <label for="tag_<%= tag.id %>" style="background-color: <%= tag.color %>; padding: 4px 8px; border-radius: 4px; display: inline-block; cursor: pointer;">
+                <%= tag.name %>
+              </label>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- 新規タグ作成セクション -->
+      <div id="new-tag-section" class="tag-section hidden p-4 bg-gray-50 rounded">
+        <div class="mb-2">
+          <%= label_tag 'new_tag[name]', 'タグ名', class: 'block mb-1' %>
+          <%= text_field_tag 'new_tag[name]', nil, class: 'w-full p-2 border rounded' %>
+        </div>
+
+        <div class="mb-2">
+          <%= label_tag 'new_tag[color]', '色', class: 'block mb-1' %>
+          <%= color_field_tag 'new_tag[color]', '#FFFFFF', class: 'p-1 border rounded' %>
+        </div>
+
+        <div class="mb-2">
+          <%= label_tag 'new_tag[context]', 'コンテキスト', class: 'block mb-1' %>
+          <%= text_field_tag 'new_tag[context]', nil, class: 'w-full p-2 border rounded' %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-6">  <!-- mt-6を追加してマージントップを増やす -->
+    <% if local_assigns[:readonly] %>
+      <%= link_to 'Edit', edit_binary_path(binary), class: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' %>
+      <%= link_to 'Back', binary_index_path, class: 'border border-gray-500 bg-white hover:bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded ml-2' %>
+    <% else %>
+      <%= form.submit class: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' %>
+      <%= link_to 'Cancel', binary.new_record? ? binary_index_path : binary_path(binary), class: 'border border-gray-500 bg-white hover:bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded ml-2' %>
+    <% end %>
+  </div>
+<% end %>
+
+<% unless local_assigns[:readonly] %>
+  <style>
+    .tag-item input[type="checkbox"] {
+      display: none;
+    }
+
+    .tag-item input[type="checkbox"]:checked + label {
+      box-shadow: 0 0 0 2px #000;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+
+  <%= javascript_tag do %>
+    function setupTagOptions() {
+      const radioButtons = document.querySelectorAll('.tag-option-radio');
+      const existingTagsSection = document.getElementById('existing-tags-section');
+      const newTagSection = document.getElementById('new-tag-section');
+
+      if (!radioButtons.length || !existingTagsSection || !newTagSection) return;
+
+      // 初期状態設定
+      if (document.querySelector('input[name="tag_option"][value="none"]').checked) {
+        existingTagsSection.classList.add('hidden');
+        newTagSection.classList.add('hidden');
+      } else if (document.querySelector('input[name="tag_option"][value="existing"]').checked) {
+        existingTagsSection.classList.remove('hidden');
+        newTagSection.classList.add('hidden');
+      } else if (document.querySelector('input[name="tag_option"][value="new"]').checked) {
+        existingTagsSection.classList.add('hidden');
+        newTagSection.classList.remove('hidden');
+      }
+
+      radioButtons.forEach(button => {
+        button.addEventListener('change', function() {
+          if (this.value === 'existing') {
+            existingTagsSection.classList.remove('hidden');
+            newTagSection.classList.add('hidden');
+            // 新規タグのフィールドをクリア
+            const nameField = document.querySelector('input[name="new_tag[name]"]');
+            if (nameField) nameField.value = '';
+          } else if (this.value === 'new') {
+            existingTagsSection.classList.add('hidden');
+            newTagSection.classList.remove('hidden');
+            // チェックボックスの選択を解除
+            document.querySelectorAll('input[name="binary[tag_ids][]"]').forEach(checkbox => {
+              checkbox.checked = false;
+            });
+          } else if (this.value === 'none') {
+            existingTagsSection.classList.add('hidden');
+            newTagSection.classList.add('hidden');
+            // すべての選択をクリア
+            document.querySelectorAll('input[name="binary[tag_ids][]"]').forEach(checkbox => {
+              checkbox.checked = false;
+            });
+            const nameField = document.querySelector('input[name="new_tag[name]"]');
+            if (nameField) nameField.value = '';
+          }
+        });
+      });
+    }
+
+    // Turbolinks/Turboに対応するためのイベントリスナー
+    if (typeof Turbolinks !== 'undefined' && Turbolinks.supported) {
+      document.addEventListener("turbolinks:load", setupTagOptions);
+    } else if (typeof Turbo !== 'undefined') {
+      document.addEventListener("turbo:load", setupTagOptions);
+    } else {
+      document.addEventListener("DOMContentLoaded", setupTagOptions);
+    }
+
+    // 初期実行（既にDOMが読み込まれている場合のため）
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupTagOptions);
+    } else {
+      setupTagOptions();
+    }
+  <% end %>
+<% end %>
