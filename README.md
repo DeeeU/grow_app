@@ -83,6 +83,7 @@ docker-compose exec web bin/rails db:migrate
 
 （開発版）やりたいこと
 
+- Vue の導入
 - Rspec のヘッドレス Chrome ブラウザのテストへの切り替え
 - フラッシュメッセージの追加
 - ✅ Docker 環境の導入
