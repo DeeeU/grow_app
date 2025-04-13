@@ -1,17 +1,5 @@
 <div>
   <h1 class="font-bold text-4xl">Create Binary</h1>
 
-  <%= form_with model: @binary,url: binary_index_path, local: true do |form| %>
-    <div class="field">
-      <%= form.label :title %>
-      <%= form.text_field :title, class: 'form-control' %>
-    </div>
-    <div class="field">
-      <%= form.label :context %>
-      <%= form.text_area :context, class: 'form-control' %>
-    </div>
-    <div>
-      <%= form.submit %>
-    </div>
-  <% end %>
+  <%= render 'form', binary: @binary %>
 </div>

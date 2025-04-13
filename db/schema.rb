@@ -10,9 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_24_143615) do
+ActiveRecord::Schema[7.1].define(version: 2024_12_15_021807) do
   create_table "binaries", force: :cascade do |t|
     t.string "title"
+    t.string "context"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "binaries_tags", id: false, force: :cascade do |t|
+    t.integer "binary_id", null: false
+    t.integer "tag_id", null: false
+    t.index ["binary_id"], name: "index_binaries_tags_on_binary_id"
+    t.index ["tag_id"], name: "index_binaries_tags_on_tag_id"
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "color", default: "#FFFFFF", null: false
     t.string "context"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

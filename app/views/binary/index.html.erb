@@ -1,5 +1,5 @@
 <div class="p-4">
-  <h1 >Binary#index</h1>
+  <h1>Binary#index</h1>
 
   <div class="flex justify-end mb-6">
     <%= form_with url: binary_index_path, method: :get, local: true, class: "mb-6" do %>
@@ -18,10 +18,21 @@
     <% @search_result.each do |binary| %>
       <a href="<%= binary_path(binary) %>" class="block max-w-sm mx-auto bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
         <%# <img class="w-full h-48 object-cover" src="https://via.placeholder.com/400x200" alt="Card image"> %>
-        <img class="w-full h-48 object-cover" src=" https://puppetsunsun.com/cdn/shop/files/RE_TOP2.png?v=1694446031&width=3840" alt="Card image">
+        <img class="w-full h-48 object-cover" src="https://puppetsunsun.com/cdn/shop/files/RE_TOP2.png?v=1694446031&width=3840" alt="Card image">
         <div class="p-6">
           <h2 class="text-2xl font-bold text-gray-800 mb-2"><%= binary.title %></h2>
-          <p class="text-gray-600"><%= truncate(binary.context, length: 25) %></p>
+          <p class="text-gray-600 mb-3"><%= truncate(binary.context, length: 25) %></p>
+
+          <!-- タグの表示 -->
+          <% if binary.tags.any? %>
+            <div class="flex flex-wrap gap-1 mt-2">
+              <% binary.tags.each do |tag| %>
+                <span style="background-color: <%= tag.color %>; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; display: inline-block; margin: 2px;">
+                  <%= tag.name %>
+                </span>
+              <% end %>
+            </div>
+          <% end %>
         </div>
       </a>
     <% end %>
