@@ -14,13 +14,16 @@ class BinaryController < ApplicationController
   end
 
   def update
+    if params[:remove_image] == '1' && @binary.image.attached?
+      @binary.image.purge
+    end
     # 新規タグの処理
     if params[:new_tag].present? && params[:new_tag][:name].present?
       tag = Tag.find_or_create_by(name: params[:new_tag][:name]) do |t|
         t.context = params[:new_tag][:context]
         t.color = params[:new_tag][:color] || '#FFFFFF'
       end
-      @binary.tags << tag unless @binary.tags.include?(tag)
+      @binary.tags << tag if tag.present? && !@binary.tags.include?(tag)
     end
 
     if @binary.update(binary_params)
@@ -47,7 +50,7 @@ class BinaryController < ApplicationController
         t.color = params[:new_tag][:color] || '#FFFFFF'
       end
     end
-    @binary.tags << tag unless @binary.tags.include?(tag)
+    @binary.tags << tag if tag.present? && !@binary.tags.include?(tag)
 
     if @binary.save
       flash.now[:success] = '日記の投稿完了'
@@ -75,6 +78,6 @@ class BinaryController < ApplicationController
   end
 
   def binary_params
-    params.require(:binary).permit(:title, :context, tag_ids: [])
+    params.require(:binary).permit(:title, :context, :image, tag_ids: [])
   end
 end
