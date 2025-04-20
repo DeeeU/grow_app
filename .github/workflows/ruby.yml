@@ -46,6 +46,15 @@ jobs:
           chromedriver --version
           google-chrome --version
 
+      - name: Set up Tailwind CSS
+        run: |
+          bundle exec rails tailwindcss:install
+          bundle exec rails tailwindcss:build
+
+      - name: Precompile assets
+        run: |
+          bundle exec rails assets:precompile RAILS_ENV=test
+
       - name: データベースのセットアップ
         run: |
           bundle exec rails db:create
