@@ -66,8 +66,7 @@ jobs:
 
       - name: Railsベストプラクティスのチェック
         run: |
-          gem install rails_best_practices
-          rails_best_practices .
+          bundle exec rails_best_practices .
 
   # オプション: CDのためのデプロイジョブ
   # デプロイ準備ができたらコメントを外す
