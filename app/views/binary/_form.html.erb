@@ -1,4 +1,8 @@
-<%= form_with model: binary, url: binary.new_record? ? binary_index_path : binary_path(binary), local: true, disabled: local_assigns[:readonly] do |form| %>
+<%= form_with(model: binary, url: binary.new_record? ? binary_index_path : binary_path(binary), local: true, html: { multipart: true }) do |form| %>
+  <% if local_assigns[:readonly] %>
+    <fieldset disabled="disabled">
+  <% end %>
+
   <div class="field mb-4">
     <%= form.label :title, class: 'block mb-1' %>
     <% if local_assigns[:readonly] %>
@@ -17,11 +21,50 @@
     <% end %>
   </div>
 
-  <div class="field mb-6">  <!-- mb-4からmb-6に変更してマージンを増やす -->
+  <!-- タグセクションの前に画像アップロードを追加 -->
+  <div class="field mb-6">
+    <h3 class="font-bold text-lg mb-2">画像</h3>
+
+    <% if local_assigns[:readonly] %>
+      <% if binary.image.attached? %>
+        <div class="mb-4">
+          <%= image_tag binary.image, class: 'border rounded', style: 'max-width: 300px; max-height: 300px; object-fit: contain;' %>
+        </div>
+      <% else %>
+        <p>画像なし</p>
+      <% end %>
+    <% else %>
+      <div class="mb-3">
+        <% if binary.image.attached? %>
+          <div class="mb-4">
+            <%= image_tag binary.image, class: 'border rounded', style: 'max-width: 300px; max-height: 300px; object-fit: contain;' %>
+          </div>
+          <div class="mb-3">
+            <label class="inline-flex items-center">
+              <%= check_box_tag 'remove_image', '1', false, class: 'mr-2', id: 'remove-image-checkbox' %>
+              <span>画像を削除</span>
+            </label>
+          </div>
+        <% else %>
+          <div class="mb-4">
+            <img src="" id="image-preview" class="border rounded hidden" style="max-height: 300px; max-width: 100%;">
+          </div>
+        <% end %>
+
+        <div class="mb-2">
+          <button type="button" id="image-upload-button" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded cursor-pointer">画像をアップロード</button>
+          <%= form.file_field :image, class: 'hidden', accept: 'image/*', id: 'image-upload' %>
+        </div>
+        <p class="text-sm text-gray-500">JPG、PNG、GIF形式（10MB以内）</p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="field mb-6">
     <h3 class="font-bold text-lg mb-2">タグ</h3>
 
     <% if local_assigns[:readonly] %>
-      <div class="flex flex-wrap gap-2 mb-4">  <!-- mb-4を追加 -->
+      <div class="flex flex-wrap gap-2 mb-4">
         <% if binary.tags.any? %>
           <% binary.tags.each do |tag| %>
             <span style="background-color: <%= tag.color %>; padding: 4px 8px; border-radius: 4px; display: inline-block; font-size: 0.75rem; display: inline-block; margin: 2px;">
@@ -83,7 +126,7 @@
     <% end %>
   </div>
 
-  <div class="mt-6">  <!-- mt-6を追加してマージントップを増やす -->
+  <div class="mt-6">
     <% if local_assigns[:readonly] %>
       <%= link_to 'Edit', edit_binary_path(binary), class: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' %>
       <%= link_to 'Back', binary_index_path, class: 'border border-gray-500 bg-white hover:bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded ml-2' %>
@@ -92,6 +135,10 @@
       <%= link_to 'Cancel', binary.new_record? ? binary_index_path : binary_path(binary), class: 'border border-gray-500 bg-white hover:bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded ml-2' %>
     <% end %>
   </div>
+
+  <% if local_assigns[:readonly] %>
+    </fieldset>
+  <% end %>
 <% end %>
 
 <% unless local_assigns[:readonly] %>
@@ -109,7 +156,12 @@
     }
   </style>
 
-  <%= javascript_tag do %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      setupTagOptions();
+      setupImageUpload();
+    });
+
     function setupTagOptions() {
       const radioButtons = document.querySelectorAll('.tag-option-radio');
       const existingTagsSection = document.getElementById('existing-tags-section');
@@ -158,20 +210,65 @@
       });
     }
 
-    // Turbolinks/Turboに対応するためのイベントリスナー
-    if (typeof Turbolinks !== 'undefined' && Turbolinks.supported) {
-      document.addEventListener("turbolinks:load", setupTagOptions);
-    } else if (typeof Turbo !== 'undefined') {
-      document.addEventListener("turbo:load", setupTagOptions);
-    } else {
-      document.addEventListener("DOMContentLoaded", setupTagOptions);
+    function setupImageUpload() {
+      const imageUpload = document.getElementById('image-upload');
+      const imagePreview = document.getElementById('image-preview');
+      const removeCheckbox = document.getElementById('remove-image-checkbox');
+      const uploadButton = document.getElementById('image-upload-button');
+
+      // ボタンクリックでファイル選択を開く
+      if (uploadButton && imageUpload) {
+        uploadButton.addEventListener('click', function() {
+          imageUpload.click();
+        });
+      }
+
+      // 画像アップロード時のプレビュー表示
+      if (imageUpload && imagePreview) {
+        imageUpload.addEventListener('change', function() {
+          if (this.files && this.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+              imagePreview.src = e.target.result;
+              imagePreview.classList.remove('hidden');
+
+              // 削除チェックボックスがある場合はチェックを外す
+              if (removeCheckbox) {
+                removeCheckbox.checked = false;
+              }
+            };
+
+            reader.readAsDataURL(this.files[0]);
+          }
+        });
+      }
+
+      // 削除チェックボックスの処理
+      if (removeCheckbox && imagePreview) {
+        removeCheckbox.addEventListener('change', function() {
+          if (this.checked) {
+            // チェックされたら画像を半透明にする
+            imagePreview.classList.add('opacity-30');
+          } else {
+            // チェックが外されたら画像を通常表示に戻す
+            imagePreview.classList.remove('opacity-30');
+          }
+        });
+      }
     }
 
-    // 初期実行（既にDOMが読み込まれている場合のため）
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setupTagOptions);
-    } else {
-      setupTagOptions();
+    // Turbolinks/Turboに対応するためのイベントリスナー追加
+    if (typeof Turbolinks !== 'undefined' && Turbolinks.supported) {
+      document.addEventListener("turbolinks:load", function() {
+        setupTagOptions();
+        setupImageUpload();
+      });
+    } else if (typeof Turbo !== 'undefined') {
+      document.addEventListener("turbo:load", function() {
+        setupTagOptions();
+        setupImageUpload();
+      });
     }
-  <% end %>
+  </script>
 <% end %>
