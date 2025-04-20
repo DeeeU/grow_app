@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe BinaryController, type: :controller do
-
   describe "GET #index" do
     it "returns http success" do
       get :index
@@ -10,17 +9,18 @@ RSpec.describe BinaryController, type: :controller do
   end
 
   describe "GET #show" do
+    let(:binary) { create(:binary) }
+
     it "returns http success" do
-      get :show
+      get :show, params: { id: binary.id }
       expect(response).to have_http_status(:success)
     end
   end
 
-  describe "GET #create" do
+  describe "POST #create" do
     it "returns http success" do
-      get :create
-      expect(response).to have_http_status(:success)
+      post :create, params: { binary: { name: "Test Binary", data: "Test Data" } }
+      expect(response).to have_http_status(:redirect)
     end
   end
-
 end

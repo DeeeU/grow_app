@@ -56,7 +56,7 @@ class BinaryController < ApplicationController
       flash.now[:success] = '日記の投稿完了'
       redirect_to binary_path(@binary.id)
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
