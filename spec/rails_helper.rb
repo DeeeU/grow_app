@@ -3,9 +3,28 @@ require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 # Prevent database truncation if the environment is production
-abort("The Rails environment is running in production mode!") if Rails.env.production?
+abort('The Rails environment is running in production mode!') if Rails.env.production?
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
+require 'capybara/rspec'
+
+# Seleniumドライバーの設定
+Capybara.register_driver :chrome_headless do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+
+  # ヘッドレスモードと関連オプション
+  options.add_argument('--headless')
+  options.add_argument('--no-sandbox')
+  options.add_argument('--disable-dev-shm-usage')
+  options.add_argument('--disable-gpu')
+  options.add_argument('--window-size=1400,1400')
+
+  # ユーザーデータディレクトリの問題を解決
+  options.add_argument('--user-data-dir=/tmp/chrome-user-data')
+  options.add_argument('--remote-debugging-port=9222')
+
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -63,4 +82,9 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+
+  # システムテストのドライバー設定
+  config.before(:each, type: :system) do
+    driven_by :chrome_headless
+  end
 end

@@ -30,6 +30,22 @@ jobs:
           gem install bundler
           bundle install --jobs 4 --retry 3
 
+      - name: Chromeのインストール
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Chromeドライバーのインストール
+        uses: nanasess/setup-chromedriver@master
+
+      - name: パスの設定と確認
+        run: |
+          export DISPLAY=:99
+          chromedriver --version
+          google-chrome --version
+
       - name: データベースのセットアップ
         run: |
           bundle exec rails db:create
