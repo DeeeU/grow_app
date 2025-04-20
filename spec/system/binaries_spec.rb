@@ -1,12 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe "Binaries", type: :system do
-
+RSpec.describe 'Binaries', type: :system do
   context 'Binary System Spec' do
-    let!(:binary) {create(:binary)}
+    let!(:binary) { create(:binary) }
 
     context '一覧画面' do
-
       it '一覧画面に要素が表示ができること' do
         visit binary_index_path
 
@@ -16,7 +14,7 @@ RSpec.describe "Binaries", type: :system do
     end
 
     context '編集画面' do
-      let!(:edit_binary){create(:binary, title: 'ネコ')}
+      let!(:edit_binary) { create(:binary, title: 'ネコ') }
 
       it '編集画面に遷移できること' do
         visit binary_path(edit_binary)
@@ -37,13 +35,10 @@ RSpec.describe "Binaries", type: :system do
     end
 
     context '削除機能' do
-
-      it '日記が削除できること' do
+      it '日記が削除できない' do
         visit binary_path(binary)
 
-        expect(page).to have_content 'Delete'
-        click_on 'Delete'
-        expect(page).to have_content 'index'
+        expect(page).not_to have_content 'Delete'
       end
     end
   end

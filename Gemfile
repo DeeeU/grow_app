@@ -47,7 +47,7 @@ gem 'bootsnap', require: false
 gem 'annotate'
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 1.2"
+gem 'image_processing', '~> 1.2'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -57,6 +57,7 @@ group :development, :test do
 
   gem 'brakeman', require: false # セキュリティ分析
   gem 'rails_best_practices', require: false # コード品質チェッカー
+  gem 'rails-controller-testing'
   gem 'rubocop', require: false # Rubyコードスタイルチェッカー
   gem 'rubocop-rails', require: false # Rails固有のコードスタイルルール
   gem 'rubocop-rspec', require: false # RSpec固有のコードスタイルルール

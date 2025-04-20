@@ -87,4 +87,16 @@ RSpec.configure do |config|
   config.before(:each, type: :system) do
     driven_by :chrome_headless
   end
+
+  # config.before(:each, type: :controller) do
+  #   # コントローラーテストではビューのレンダリングを無効化
+  #   controller.class.before_action do
+  #     # ビューをレンダリングする代わりに何もしない
+  #     def render(*args)
+  #       # レスポンスを設定するだけ
+  #       response.body = ''
+  #       response.status = args.last.is_a?(Hash) && args.last[:status] ? args.last[:status] : 200
+  #     end
+  #   end
+  # end
 end
