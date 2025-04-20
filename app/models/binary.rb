@@ -16,18 +16,22 @@ class Binary < ApplicationRecord
 
   scope :search_title, ->(title) { where('title LIKE ?', "%#{title}%") }
 
+  # def add_tag(tag_params)
+  #   tag = Tag.find_or_create_from_params(tag_params)
+  #   tags << tag unless tag.nil? || tags.include?(tag)
+  #   tag
+  # end
+
   private
 
   def acceptable_image
     return unless image.attached?
 
-    if image.blob.byte_size > 10.megabytes
-      errors.add(:image, 'needs to be less than 10MB')
-    end
+    errors.add(:image, 'needs to be less than 10MB') if image.blob.byte_size > 10.megabytes
 
     acceptable_image_types = ['image/jpeg', 'image/png', 'image/jpg']
-    unless acceptable_image_types.include?(image.blob.content_type)
-      errors.add(:image, 'needs to be a JPEG, JPG, or PNG')
-    end
+    return if acceptable_image_types.include?(image.blob.content_type)
+
+    errors.add(:image, 'needs to be a JPEG, JPG, or PNG')
   end
 end

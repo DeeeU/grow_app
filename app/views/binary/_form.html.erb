@@ -95,7 +95,7 @@
       <!-- 既存タグ選択セクション -->
       <div id="existing-tags-section" class="tag-section hidden">
         <div class="flex flex-wrap gap-2">
-          <% @tags.each do |tag| %>
+          <% tags.each do |tag| %>
             <div class="tag-item">
               <%= check_box_tag 'binary[tag_ids][]', tag.id, binary.tags.include?(tag), id: "tag_#{tag.id}" %>
               <label for="tag_<%= tag.id %>" style="background-color: <%= tag.color %>; padding: 4px 8px; border-radius: 4px; display: inline-block; cursor: pointer;">

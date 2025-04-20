@@ -12,5 +12,21 @@
 require 'rails_helper'
 
 RSpec.describe Tag, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'バリデーション' do
+    let(:tag) { create(:tag) }
+
+    it '有効なタグ' do
+      expect(tag).to be_valid
+    end
+
+    it '名前が空の場合は無効' do
+      tag.name = nil
+      expect(tag).not_to be_valid
+    end
+
+    it '色が不正な場合は無効' do
+      tag.color = 'invalid_color'
+      expect(tag).not_to be_valid
+    end
+  end
 end

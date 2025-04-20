@@ -1,38 +1,109 @@
-# # This workflow uses actions that are not certified by GitHub.
-# # They are provided by a third-party and are governed by
-# # separate terms of service, privacy policy, and support
-# # documentation.
-# # This workflow will download a prebuilt Ruby version, install dependencies and run tests with Rake
-# # For more information see: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
+name: Ruby_pipeline
 
-# name: Ruby
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
-# on:
-#   push:
-#     branches: [ "main" ]
-#   pull_request:
-#     branches: [ "main" ]
+jobs:
+  test:
+    runs-on: ubuntu-latest
 
-# permissions:
-#   contents: read
+    services:
+      sqlite:
+        image: nouchka/sqlite3:latest
+        ports:
+          - 3306
 
-# jobs:
-#   test:
+    steps:
+      - uses: actions/checkout@v4
 
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         ruby-version: ['2.6', '2.7', '3.0']
+      - name: Rubyのセットアップ
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.0
+          bundler-cache: true # インストールされたgemをキャッシュ
 
-#     steps:
-#     - uses: actions/checkout@v4
-#     - name: Set up Ruby
-#     # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
-#     # change this to (see https://github.com/ruby/setup-ruby#versioning):
-#     # uses: ruby/setup-ruby@v1
-#       uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
-#       with:
-#         ruby-version: ${{ matrix.ruby-version }}
-#         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-#     - name: Run tests
-#       run: bundle exec rake
+      - name: 依存関係のインストール
+        run: |
+          gem install bundler
+          bundle install --jobs 4 --retry 3
+
+      - name: Chromeのインストール
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Chromeドライバーのインストール
+        uses: nanasess/setup-chromedriver@master
+
+      - name: パスの設定と確認
+        run: |
+          export DISPLAY=:99
+          chromedriver --version
+          google-chrome --version
+
+      - name: Set up Tailwind CSS
+        run: |
+          bundle exec rails tailwindcss:install
+          bundle exec rails tailwindcss:build
+
+      - name: Precompile assets
+        run: |
+          bundle exec rails assets:precompile RAILS_ENV=test
+
+      - name: データベースのセットアップ
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+
+      - name: テストの実行
+        run: bundle exec rspec
+
+      - name: Rubocopの実行
+        run: bundle exec rubocop || true
+        # 最初はスタイルの問題でCIが失敗しないように "|| true" を追加
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rubyのセットアップ
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.0
+          bundler-cache: true
+
+      - name: 依存関係のインストール
+        run: |
+          gem install bundler
+          bundle install --jobs 4 --retry 3
+
+      - name: Brakemanでコード分析
+        run: |
+          gem install brakeman
+          brakeman -A -q -w2
+
+      - name: Railsベストプラクティスのチェック
+        run: |
+          bundle exec rails_best_practices .
+
+  # オプション: CDのためのデプロイジョブ
+  # デプロイ準備ができたらコメントを外す
+  # deploy:
+  #   needs: [test, lint]
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #   runs-on: ubuntu-latest
+  #
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #
+  #   - name: 本番環境へのデプロイ
+  #     # ここにデプロイ手順を追加
+  #     # これはHeroku、AWSなどへのデプロイになる可能性があります
+  #     run: echo "ここでデプロイが行われます"
