@@ -16,11 +16,11 @@ class Binary < ApplicationRecord
 
   scope :search_title, ->(title) { where('title LIKE ?', "%#{title}%") }
 
-  # def add_tag(tag_params)
-  #   tag = Tag.find_or_create_from_params(tag_params)
-  #   tags << tag unless tag.nil? || tags.include?(tag)
-  #   tag
-  # end
+  def add_tag(tag_params)
+    tag = Tag.find_or_create_from_params(tag_params)
+    tags << tag unless tag.nil? || tags.include?(tag)
+    tag
+  end
 
   private
 

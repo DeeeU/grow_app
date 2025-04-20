@@ -1,5 +1,6 @@
 class BinaryController < ApplicationController
-  before_action :set_binary, only: [:show, :edit, :update]
+  before_action :set_binary, only: %i[show edit update]
+  before_action :set_all_tags, only: %i[new create edit update]
 
   def index
     @binaries = Binary.all
@@ -10,47 +11,27 @@ class BinaryController < ApplicationController
   end
 
   def edit
-    @tags = Tag.all
   end
 
   def update
-    if params[:remove_image] == '1' && @binary.image.attached?
-      @binary.image.purge
-    end
-    # 新規タグの処理
-    if params[:new_tag].present? && params[:new_tag][:name].present?
-      tag = Tag.find_or_create_by(name: params[:new_tag][:name]) do |t|
-        t.context = params[:new_tag][:context]
-        t.color = params[:new_tag][:color] || '#FFFFFF'
-      end
-      @binary.tags << tag if tag.present? && !@binary.tags.include?(tag)
-    end
+    process_purge_image
+    process_add_tag
 
     if @binary.update(binary_params)
       flash.now[:success] = '日記の編集完了'
       redirect_to binary_path(@binary.id)
     else
-      @tags = Tag.all
       render :edit
     end
   end
 
   def new
     @binary = Binary.new
-    @tags = Tag.all
   end
 
   def create
     @binary = Binary.new(binary_params)
-    @tags = Tag.all
-
-    if params[:new_tag].present? && params[:new_tag][:name].present?
-      tag = Tag.find_or_create_by(name: params[:new_tag][:name]) do |t|
-        t.context = params[:new_tag][:context]
-        t.color = params[:new_tag][:color] || '#FFFFFF'
-      end
-    end
-    @binary.tags << tag if tag.present? && !@binary.tags.include?(tag)
+    @binary.add_tag(params[:new_tag]) if params[:new_tag].present? && params[:new_tag][:name].present?
 
     if @binary.save
       flash.now[:success] = '日記の投稿完了'
@@ -77,7 +58,19 @@ class BinaryController < ApplicationController
     @binary = Binary.find(params[:id])
   end
 
+  def set_all_tags
+    @tags = Tag.all
+  end
+
   def binary_params
     params.require(:binary).permit(:title, :context, :image, tag_ids: [])
+  end
+
+  def process_purge_image
+    @binary.image.purge if params[:remove_image] == '1' && @binary.image.attached?
+  end
+
+  def process_add_tag
+    @binary.add_tag(params[:new_tag]) if params[:new_tag].present? && params[:new_tag][:name].present?
   end
 end
