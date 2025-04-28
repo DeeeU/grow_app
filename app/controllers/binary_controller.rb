@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class BinaryController < ApplicationController # rubocop:disable Style/Documentation
+  skip_before_action :require_login, only: [:index]
   before_action :set_binary, only: %i[show edit update]
   before_action :set_all_tags, only: %i[new create edit update]
 
