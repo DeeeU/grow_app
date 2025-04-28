@@ -1,7 +1,7 @@
-class TagController < ApplicationController
+# frozen_string_literal: true
 
-  def edit
-  end
+class TagController < ApplicationController
+  def edit; end
 
   def new
     @tag = Tag.new
@@ -9,15 +9,12 @@ class TagController < ApplicationController
 
   def create
     @tag = Tag.new(tag_params)
-    if @tag.save
-      return true
-    else
-      render :new
-    end
+    return true if @tag.save
+
+    render :new
   end
 
-  def delete
-  end
+  def delete; end
 
   private
 

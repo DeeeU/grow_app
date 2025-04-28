@@ -3,6 +3,32 @@
 This README would normally document whatever steps are necessary to get the
 application up and running.
 
+## Claude Code を使った開発ガイド
+
+Claude Code を使うと、効率的にコード開発を進めることができます。以下の手順で活用しましょう。
+
+### はじめ方
+
+1. `/init` コマンドを実行して、CLAUDE.md ファイルを作成します
+
+   - このファイルは、プロジェクト開発時の Claude の指示内容を含みます
+
+2. `/terminal-setup` を実行して、ターミナル連携を設定します
+   - これにより、コマンドの提案や実行結果を Claude が理解できるようになります
+
+### 活用方法
+
+- **ファイル分析**: コードの理解や問題点の特定を Claude に依頼できます
+- **コード編集**: 機能追加やバグ修正のコード提案をしてもらえます
+- **Bash/Git コマンド**: 適切なコマンドの提案や実行手順をガイドしてもらえます
+
+### 効果的な使い方のヒント
+
+- 小規模な機能追加やバグ修正から始めると効果的です
+- 具体的な実装プランの提案を Claude に依頼しましょう
+- Claude が提案した変更は必ず確認してからマージしてください
+- 他のエンジニアに対するのと同じように、具体的な指示を出すことで最良の結果が得られます
+
 ## Development Environment
 
 ### Traditional Setup
