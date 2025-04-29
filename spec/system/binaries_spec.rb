@@ -18,19 +18,21 @@ RSpec.describe 'Binaries', type: :system do
       let!(:edit_binary) { create(:binary, title: 'ネコ') }
 
       before do
-        # ログイン処理
-        visit login_path
-        fill_in 'Email', with: user.email
-        fill_in 'Password', with: 'password123'
-        click_button 'ログイン'
+        # ヘルパーメソッドを使用してログイン
+        login(user)
       end
 
       it '編集画面に遷移できること' do
         visit binary_path(edit_binary)
 
-        expect(page).to have_content 'Edit'
+        # 詳細ページからの遷移を確認
+        expect(page).to have_content 'Binary Details'
+        expect(page).to have_content edit_binary.title
+        
+        # 編集リンクをクリックして編集画面に遷移
         click_on 'Edit'
         expect(page).to have_content 'Edit Binary'
+        expect(page).to have_button 'Update Binary'
       end
 
       it '編集ができること' do
@@ -38,18 +40,18 @@ RSpec.describe 'Binaries', type: :system do
         click_on 'Edit'
 
         fill_in 'Title', with: 'にゃーん'
+        # デフォルトのRailsの更新ボタンのテキスト
         click_on 'Update Binary'
-        expect(page).to have_content 'Details'
+        # 詳細ページに正しく遷移するか確認
+        expect(page).to have_content 'Binary Details'
+        expect(page).to have_content 'にゃーん'
       end
     end
 
     context '削除機能' do
       before do
-        # ログイン処理
-        visit login_path
-        fill_in 'Email', with: user.email
-        fill_in 'Password', with: 'password123'
-        click_button 'ログイン'
+        # ヘルパーメソッドを使用してログイン
+        login(user)
       end
 
       it '日記が削除できない' do

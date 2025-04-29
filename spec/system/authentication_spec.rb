@@ -69,11 +69,8 @@ RSpec.describe 'Authentication', type: :system do
     let!(:user) { create(:user) }
 
     it 'allows a logged in user to logout' do
-      # Log in first
-      visit login_path
-      fill_in 'Email', with: user.email
-      fill_in 'Password', with: 'password123'
-      click_button 'ログイン'
+      # ヘルパーメソッドを使用してログイン
+      login(user)
 
       # ログイン状態を確認
       expect(page).to have_link('ログアウト')
