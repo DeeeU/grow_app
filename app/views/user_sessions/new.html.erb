@@ -1,0 +1,27 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <h1 class="text-4xl font-bold text-center mb-8">ログイン</h1>
+
+  <%= form_with(url: login_path, method: :post, class: "bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4") do |form| %>
+    <div class="mb-4">
+      <%= form.label :email, class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.email_field :email, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+
+    <div class="mb-6">
+      <%= form.label :password, class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.password_field :password, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+      <p class="text-right mt-1">
+        <%= link_to "パスワードを忘れた", "#", data: { controller: "turbo-modal", turbo_modal_target: "passwordReset", turbo_stream: true, action: "click->turbo-modal#openModal", turbo: { frame: "password_reset_modal" } }, class: "inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" %>
+      </p>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <%= form.submit "ログイン", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer" %>
+      <%= link_to "新規登録", new_user_path, class: "inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" %>
+    </div>
+  <% end %>
+</div>
+
+<div id="password_reset_modal" data-turbo-modal-target="dialog" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
+  <turbo-frame id="password_reset_frame" src="<%= reset_dialog_path %>"></turbo-frame>
+</div>
